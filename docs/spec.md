@@ -4,7 +4,9 @@ Raven is a fast, pragmatic general-purpose language mixing imperative and object
 
 > You are reading a very early version of the specification, which means there might be some specific details missing, information might be vage/poor, etc. This document will become more and more formal and informative with time, but for now, don't expect much, as not even the prototype compiler is done. \
 >\
-> If you notice any errors or have suggestions, please open an issue or a pull request.
+> If you notice any errors or have suggestions, please open an issue or a pull request.\
+>\
+>Also note that I am natively a Spanish speaker and don't have perfect, native english. It's a struggle to make even a paragraph a formal and well-structured piece you expect to find in a specification. As I said, feel free to correct anything in a pull request! I may also write a version of the specification in Spanish and translate every version to English to make the process easier, although the English specification will get updates later.
 
 # 2. Semantics
 > **DISCLAIMER:** work in progress!

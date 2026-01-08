@@ -6,8 +6,8 @@ Although the initial design (sketching) is nearly complete, the formal specifica
 The specification will serve as a comprehensive reference for development, achieving balance between high-level guidance and necessary detail. While design refinements will continue iteratively in later phases, completing the specification ensures a solid foundation for Phase 1 and subsequent development.
 
 ---
-## Phase 1: the Typescript compiler
-Phase 1 consists of a minimal compiler written in Typescript that generates C code, with the purpose of:
+## Phase 1: the prototype
+Phase 1 consists of a minimal compiler written in C that generates either C code or direct x86 NASM (only x86 for this phase), with the purpose of:
 
 * Stress-testing the language with edge cases and illegal statements to ensure that both this phase and subsequent phases can handle maximum stress.
 * Identifying design flaws, inconsistencies, and contradictions, and, overall, refining the design as much as possible.
@@ -23,8 +23,8 @@ Once the compiler has successfully:
 * Structured the syntax and semantics to ensure subsequent phases can handle significant stress.
 
 ---
-## Phase 2: the C compiler
-After refining the design as much as possible in Phase 1, this phase focuses on porting the minimal Typescript compiler to C.
+## Phase 2: the v1 compiler
+After refining the design as much as possible in Phase 1, this phase focuses on transforming the minimal prototype compiler to a robust and polished version.
 
 The compiler will prioritize optimizations and functionality over design, which has already been sufficiently iterated, while Phase 1 was not.
 
@@ -33,7 +33,7 @@ The purpose of this phase is to produce a compiler robust enough to be considere
 > Raven will initially support Linux, followed by Windows, and finally macOS. Version 1 will only be released once all platforms are supported, though macOS may receive full support slightly later due to hardware availability.
 
 ---
-## Phase 3: the Raven compiler
+## Phase 3: the stage 2 compiler
 Once Raven is sufficiently stable and self-hosting is judged beneficial for development speed and convenience, a compiler written in Raven itself will be developed.
 
 This phase, while planned and likely to occur, may take place in later versions and is not required for version 1. The timing of self-hosting cannot really be predicted and will be pursue when appropriate, after Phases 1 and 2.
