@@ -14,7 +14,9 @@ After version 1 Raven will basically be done, although there will still be thing
 I want to make Raven a batteries-included language (without too much bloat, I don't want to make Raven programs a RAM killer, specially with today's RAM prices cough cough <small>AI</small>. cough).
 - **Tooling**: Raven obviously needs more than just the compiler for users to love it, because who would write an application in 2026 without LSP (Language Server Protocol, basically live errors, warnings and autocompletion), proper syntax highlighting and debugging/REPL tools? 
 Some people (example: me), yes, but it's necessary that I do at least LSP.
-- **Modules, dependencies, configuration**: as any mature language, I have planned adding a package system and module-based projects to Raven. 
+- **Configuring**: something that I **REALLY** want to implement is configuration. Not any configuration, but the kind of one that allows you to modify/disable the entire standard library, add additional behavior 
+(in the form of intermediate behavior, limited to add behavior before the last phase [compilation], where you get the optimized AST), among other useful things. Even if I want to implement this, it's one of those things that **I don't guarantee**.
+- **Modules, dependencies**: as any mature language, I have planned adding a package system and module-based projects to Raven. 
 What I mean exactly with a package system is the ability to download packages directly from the internet with a CLI, which can then be used inside the project; the auxiliary name is Aviary, but it will be confirmed when I get there. 
 Module-based projects is basically a change in the structure of projects, with "modules" being present, and each module containing members of various files instead of each file being it's own module with it's own members. 
 - **Further optimization and enhancements**: Phase 1 *seems* enough to settle Raven's design, until you notice that the only way Raven is ever going to be used seriously is if it has already developed a community (even if small) that can give their honest feedback to improve Raven. 
