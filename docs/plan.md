@@ -6,7 +6,7 @@ Following [the roadmap](https://git.ddoichita.dev/nykenik24/raven#roadmap) locat
 - **Optimization**: 1) write something until it's finished 2) optimize 3) test, benchmark 4) repeat from step 2.
 
 ---
-## Phase 2: further improvments
+## Phase 2: further improvements
 Phase 2 consists of all versions after v1.0 and before phase 3's self-hosting. 
 It's mostly focused on adding to the phase 1's compiler and trying to make Raven be more "professional" (double quotes mean Raven will not be SaaS startup garbage, Raven is always FOSS ♥) and beginner-friendly, with things less focused on the internals.
 
