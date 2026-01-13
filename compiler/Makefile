@@ -5,19 +5,30 @@ LDFLAGS :=
 SRC_DIR   := src
 BUILD_DIR := build
 TARGET    := $(BUILD_DIR)/compiler
+TARGET_DEBUG := $(BUILD_DIR)/compiler_debug
 
 SRC := $(shell find $(SRC_DIR) -type f -name '*.c')
-OBJ := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC))
 DEP := $(OBJ:.o=.d)
 
-all: $(TARGET)
+OBJ_RELEASE := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/release/%.o,$(SRC))
+OBJ_DEBUG   := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/debug/%.o,$(SRC))
 
-$(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $@ $(LDFLAGS)
+all: $(TARGET) $(TARGET_DEBUG)
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+$(TARGET): $(OBJ_RELEASE)
+	$(CC) $^ -o $@
+
+$(TARGET_DEBUG): $(OBJ_DEBUG)
+	$(CC) $^ -o $@
+
+$(BUILD_DIR)/release/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/debug/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -DRAVEN_SHOW_DEBUG_OUTPUT -c $< -o $@
+
 
 clean:
 	rm -rf $(BUILD_DIR)

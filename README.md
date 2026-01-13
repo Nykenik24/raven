@@ -9,15 +9,18 @@ Right now there are no packages nor built executables, the only way to use Raven
 ```bash
 # supposing you are in the repo's root
 cd compiler
-make
+make all
 ```
-
-To try the non-existent compiler, run `/compiler/build/compiler`.
 
 To generate `compile_commands.json`, ensure you have `bear` installed and run this instead of the normal `make` command:
 ```bash
-bear -- make
+bear -- make all
 ```
+
+## Run
+There are two binaries in `raven/compiler/build/` after [building](README#Build):
+- `compiler`: Normal binary. Preferred.
+- `compiler_debug`: Binary with ALL information, useful for debugging. This is for early versions, I will add flags later, which will make this binary obsolete for users and only useful for me.
 
 Note that Raven will first support Linux, then Windows and finally MacOS (full support coming probably later than version 1).
 
