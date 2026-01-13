@@ -19,6 +19,8 @@ To generate `compile_commands.json`, ensure you have `bear` installed and run th
 bear -- make
 ```
 
+Note that Raven will first support Linux, then Windows and finally MacOS (full support coming probably later than version 1).
+
 # Roadmap
 
 ## Phase 1
