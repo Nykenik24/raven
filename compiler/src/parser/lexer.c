@@ -135,7 +135,7 @@ token_list_t *lex(const char *source) {
     }
 
     if (is_digit_char(c)) {
-      char *num = malloc(source_len + 1);
+      char *num = calloc(source_len + 1, 1);
       num[0] = c;
       SKIP_CHAR_IF_INBOUNDS;
 
@@ -151,13 +151,13 @@ token_list_t *lex(const char *source) {
     if (c == '"' || c == '\'') {
       char end = c;
       SKIP_CHAR_IF_INBOUNDS;
-      char *str = malloc(source_len + 1);
+      char *str = calloc(source_len + 1, 1);
 
       while (c != end) {
         if (c == '$' && !NEXT_C_OUT_OF_BOUNDS && source[i + 1] == '{') {
           SKIP_CHAR_IF_INBOUNDS;
           SKIP_CHAR_IF_INBOUNDS;
-          char *interpol = malloc(source_len + 1);
+          char *interpol = calloc(source_len + 1, 1);
           while (c != '}') {
             strcatchr(interpol, c);
             SKIP_CHAR_IF_INBOUNDS;
@@ -177,14 +177,14 @@ token_list_t *lex(const char *source) {
     }
 
     if (is_punct_char(c)) {
-      char *punct = malloc(source_len + 1);
+      char *punct = calloc(source_len + 1, 1);
       strcatchr(punct, c);
       append_to_token_list(tokens, new_token(punct, T_PUNCTUATION, line, col));
       continue;
     }
 
     if (is_op_char(c)) {
-      char *op = malloc(source_len + 1);
+      char *op = calloc(source_len + 1, 1);
       strcatchr(op, c);
       SKIP_CHAR_IF_INBOUNDS;
       if ((op[0] == '>' && c == '=') || (op[0] == '<' && c == '=') ||
@@ -196,7 +196,7 @@ token_list_t *lex(const char *source) {
     }
 
     if (is_alpha_char(c) || c == '_') {
-      char *id = malloc(source_len + 1);
+      char *id = calloc(source_len + 1, 1);
 
       while (is_alpha_char(c) || is_digit_char(c) || c == '_') {
         strcatchr(id, c);
@@ -219,7 +219,7 @@ token_list_t *lex(const char *source) {
     }
 
     if (c == '#') {
-      char *deco = malloc(source_len + 1);
+      char *deco = calloc(source_len + 1, 1);
       SKIP_CHAR_IF_INBOUNDS;
       while (c != '\n' && c != '\r') {
         strcatchr(deco, c);
@@ -234,7 +234,7 @@ token_list_t *lex(const char *source) {
       if (c == '"' || c == '\'') {
         char end = c;
         SKIP_CHAR_IF_INBOUNDS;
-        char *tag = malloc(source_len + 1);
+        char *tag = calloc(source_len + 1, 1);
 
         while (c != end) {
           strcatchr(tag, c);

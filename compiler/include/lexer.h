@@ -1,7 +1,7 @@
 #ifndef INCLUDE_INCLUDE_LEXER_H_
 #define INCLUDE_INCLUDE_LEXER_H_
 
-#define TOKEN_MAX 0xFFFF
+#define TOKEN_MAX 0xFFFFF
 
 typedef enum {
   T_EOF,

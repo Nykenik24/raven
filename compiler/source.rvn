@@ -1,25 +1,24 @@
-function printFibonnaci(numbers: int) void {
-	let a = 0
-	let b = 1
-	let next = 0;
-	
-	let i = 0;
-	until (i < numbers) {
-		if (i == 0) {
-			printf("%d\n", a);
-		} else if (i == 1) {
-			printf("%d\n", a);
-		} else {
-			next = a + b;
-			printf("%d\n", next);
-			a = b;
-			b = next;
-		}
-		i++;
-	}
+function safeCall(f: (void)int) {
+  return function() int {
+    let res: int;
+    try {
+      res = f();
+    } catch (msg) {
+      print("${f} threw: ${msg}");
+      return 0;
+    }
+    return res;
+  }
+}
+
+#safeCall
+function divide(a: int, b: int) int {
+  if (b == 0) throw "Can't divide by zero";
+  return a / b;
 }
 
 function main() int {
-	printFibonnaci(numbers: 10);
-	return 0;
+  divide(6, 2);
+  divide(5, 0); // Will be handled by the decorator
+  return 0;
 }
