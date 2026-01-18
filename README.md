@@ -31,9 +31,9 @@ Note that Raven will first support Linux, then Windows and finally MacOS (full s
 
 - [x] **Lexer**: converts the raw source into *tokens* (=words) inside a token list. [Source](./compiler/src/parser/lexer.c).
   - [x] Error handling. Can be enhanced, but it will evolve if other phases elaborate on error handling (`rvnerror.h`), so marked as done for now.
-- [ ] **Parser**: converts the tokens into *nodes* (=phrases) inside a parse tree.
+- [ ] **Parser**: generates a CST (*Concrete-Syntax Tree*), a raw representation of the program, excluding symbols that are not needed and are purely syntactical.
   - [ ] Error handling.
-- [ ] **Simplifier**: converts the parse tree (which is complex, bloated and full of unnecessary nesting) into a much simpler AST (*Abstract Syntax Tree*).
+- [ ] **Simplifier**: converts the CST (which is bloated and full of unnecessary nesting) into a much simpler AST (*Abstract Syntax Tree*).
 - [ ] **Semantical analyzer**: analyzes the AST before compilation to check for semantic error before wasting resources compiling clearly illegal (semantically) code.
   - [ ] Error handling.
 - [ ] **Optimizer**: tries to optimize the code as much as possible: optimizes loops, removes code that doesn't affect the output (dead code), reuses previously calculated values, among other optimizations. Not to be confused with optimiziation of Raven as whole.
