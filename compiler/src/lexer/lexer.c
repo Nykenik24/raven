@@ -62,7 +62,7 @@ void append_to_token_list(token_list_t *list, token_t *token) {
   }
   list->tokens[list->token_num] = token;
   list->token_num++;
-  //_display_token(token);
+  // _display_token(token);
 }
 
 int is_digit_char(char c) {
@@ -89,7 +89,7 @@ int is_punct_char(char c) {
 
 int is_op_char(char c) {
   if (c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '>' ||
-      c == '<' || c == '=' || c == '!') {
+      c == '<' || c == '=' || c == '!' || c == '%') {
     return 1;
   }
   return 0;
@@ -127,7 +127,7 @@ token_list_t *lex(const char *source) {
     }
 
     if (c == ' ' || c == '\n' || c == '\t' || c == '\r') {
-      if (c == '\n') {
+      if (c == '\n' || c == '\r') {
         line++;
         col = 1;
         goto new_line;
@@ -144,6 +144,14 @@ token_list_t *lex(const char *source) {
       while (is_digit_char(c) == 1) {
         strcatchr(num, c);
         SKIP_CHAR_IF_INBOUNDS;
+      }
+      if (c == '.') {
+        strcatchr(num, c);
+        SKIP_CHAR_IF_INBOUNDS;
+        while (is_digit_char(c) == 1) {
+          strcatchr(num, c);
+          SKIP_CHAR_IF_INBOUNDS;
+        }
       }
       append_to_token_list(tokens, new_token(num, T_NUMBER, line, col));
 
@@ -181,6 +189,11 @@ token_list_t *lex(const char *source) {
     if (is_punct_char(c)) {
       char *punct = calloc(source_len + 1, 1);
       strcatchr(punct, c);
+      if (c == '.' && !NEXT_C_OUT_OF_BOUNDS && source[i + 1] == '.' &&
+          (i + 2 <= source_len) && source[i + 2] == '.') {
+        strcat(punct, "..");
+        i += 2;
+      }
       append_to_token_list(tokens, new_token(punct, T_PUNCTUATION, line, col));
       continue;
     }

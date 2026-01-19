@@ -2,24 +2,30 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "raven/colors.h"
 #include "raven/error.h"
 #include "raven/lexer/lexer.h"
 #include "raven/macros.h"
 #include "raven/parser/parser.h"
 #include "raven/parser/tree.h"
+#include "raven/utils.h"
 
-#define currtok (tokens->tokens[index])
+#define currtok (tokens->tokens[*index])
 #define tok_txt_is(TXT) (strcmp(currtok->txt, TXT) == 0)
 #define tok_type_is(TYPE) (currtok->type == TYPE)
 #define expect(TXT)                                                            \
   if (!tok_txt_is(TXT)) {                                                      \
     THROW("Expected token '%s', got '%s'.", TXT, currtok->txt);                \
   }
+
 #define skip()                                                                 \
-  index++;                                                                     \
-  if (index > (size_t)tokens->token_num) {                                     \
-    THROW("Out of bounds when parsing. Expected more tokens.");                \
-  }
+  do {                                                                         \
+    (*index)++;                                                                \
+    if (*index >= (size_t)tokens->token_num) {                                 \
+      THROW("Out of bounds when parsing. Expected more tokens.");              \
+    }                                                                          \
+  } while (0)
+
 #define expectskip(TXT)                                                        \
   expect(TXT);                                                                 \
   skip();
@@ -28,9 +34,8 @@ tree_t *parse(token_list_t *tokens) {
   char rootstr[1];
   rootstr[0] = '\0';
   tree_t *root = new_tree(TREE_ROOT, rootstr, "Root");
-
-  for (size_t i = 0; i <= (size_t)tokens->token_num;) {
-    add_child(root, parse_declaration(tokens, i));
+  for (size_t i = 0; i < (size_t)tokens->token_num;) {
+    add_child(root, parse_declaration(tokens, &i));
   }
 
   return root;
@@ -38,7 +43,7 @@ tree_t *parse(token_list_t *tokens) {
 
 /* Literals */
 
-tree_t *parse_literal(token_list_t *tokens, size_t index) {
+tree_t *parse_literal(token_list_t *tokens, size_t *index) {
   switch (currtok->type) {
   case T_NUMBER:
     skip();
@@ -75,25 +80,27 @@ tree_t *parse_literal(token_list_t *tokens, size_t index) {
   }
 }
 
-tree_t *parse_literal_array(token_list_t *tokens, size_t index) {
+tree_t *parse_literal_array(token_list_t *tokens, size_t *index) {
   tree_t *array_literal = new_tree(TREE_ARRAY_LITERAL, "", "Array");
   expect("[");
 
   if (tok_txt_is("]")) {
+    skip();
     return array_literal;
   }
 
   add_child(array_literal, parse_expr(tokens, index));
+  skip();
   while (tok_txt_is(",")) {
     skip();
     add_child(array_literal, parse_expr(tokens, index));
   }
 
-  expectskip("}");
+  expectskip("]");
   return array_literal;
 }
 
-tree_t *parse_literal_map_keyvalue(token_list_t *tokens, size_t index) {
+tree_t *parse_literal_map_keyvalue(token_list_t *tokens, size_t *index) {
   tree_t *keyvalue = new_tree(TREE_MAP_KEYVALUE, "", "Map:KeyValue");
 
   expectskip("[");
@@ -108,15 +115,17 @@ tree_t *parse_literal_map_keyvalue(token_list_t *tokens, size_t index) {
   return keyvalue;
 }
 
-tree_t *parse_literal_map(token_list_t *tokens, size_t index) {
+tree_t *parse_literal_map(token_list_t *tokens, size_t *index) {
   tree_t *map_literal = new_tree(TREE_MAP_LITERAL, "", "Map");
   expect("{");
 
   if (tok_txt_is("}")) {
+    skip();
     return map_literal;
   }
 
   add_child(map_literal, parse_literal_map_keyvalue(tokens, index));
+  skip();
   while (tok_txt_is(",")) {
     skip();
     add_child(map_literal, parse_literal_map_keyvalue(tokens, index));
@@ -127,9 +136,11 @@ tree_t *parse_literal_map(token_list_t *tokens, size_t index) {
 
 /* Types */
 
-tree_t *parse_type(token_list_t *tokens, size_t index) {
+tree_t *parse_type(token_list_t *tokens, size_t *index) {
   if (tok_type_is(T_ID)) {
-    return new_tree(TREE_TYPE, currtok->txt, "Type");
+    tree_t *type = new_tree(TREE_TYPE, currtok->txt, "Type");
+    skip();
+    return type;
   } else if (tok_txt_is("[")) {
     skip();
     tree_t *array_type = new_tree(TREE_ARRAY_TYPE, "", "Type:Array");
@@ -170,7 +181,7 @@ tree_t *parse_type(token_list_t *tokens, size_t index) {
 
 /* Declarations */
 
-tree_t *parse_declaration(token_list_t *tokens, size_t index) {
+tree_t *parse_declaration(token_list_t *tokens, size_t *index) {
   switch (currtok->type) {
   case T_LET:
   case T_CONST:
@@ -191,7 +202,7 @@ tree_t *parse_declaration(token_list_t *tokens, size_t index) {
   }
 }
 
-tree_t *parse_decl_variable(token_list_t *tokens, size_t index) {
+tree_t *parse_decl_variable(token_list_t *tokens, size_t *index) {
   tree_t *var_decl = new_tree(TREE_VAR_DECL, "", "VarDecl");
   add_child(var_decl,
             new_tree(TREE_VAR_DECL_MUTB, currtok->txt, "VarDecl:Mutability"));
@@ -216,7 +227,7 @@ tree_t *parse_decl_variable(token_list_t *tokens, size_t index) {
   return var_decl;
 }
 
-tree_t *parse_decl_function_param(token_list_t *tokens, size_t index) {
+tree_t *parse_decl_function_param(token_list_t *tokens, size_t *index) {
   if (tok_txt_is("self")) {
     return new_tree(TREE_FUNC_DECL_SELF, "self", "FuncDecl:Param:Self");
   } else if (tok_txt_is("...")) {
@@ -262,7 +273,7 @@ tree_t *parse_decl_function_param(token_list_t *tokens, size_t index) {
         currtok->txt);
 }
 
-tree_t *parse_decl_function(token_list_t *tokens, size_t index) {
+tree_t *parse_decl_function(token_list_t *tokens, size_t *index) {
   tree_t *func_decl = new_tree(TREE_FUNC_DECL, "", "FuncDecl");
 
   while (tok_type_is(T_DECORATOR)) {
@@ -288,6 +299,7 @@ tree_t *parse_decl_function(token_list_t *tokens, size_t index) {
   }
 
   add_child(func_decl, parse_decl_function_param(tokens, index));
+  skip();
   while (tok_txt_is(",")) {
     skip();
     add_child(func_decl, parse_decl_function_param(tokens, index));
@@ -306,15 +318,155 @@ func_block:
   return func_decl;
 }
 
-// tree_t *parse_decl_struct_field(token_list_t *tokens, size_t index);
-// tree_t *parse_decl_struct(token_list_t *tokens, size_t index);
+tree_t *parse_decl_struct_param(token_list_t *tokens, size_t *index) {
+  if (tok_type_is(T_ID)) {
+    tree_t *param = new_tree(TREE_STRUCT_DECL_PARAM, "", "StructDecl:Param");
+    add_child(param, new_tree(TREE_STRUCT_DECL_PARAM_NAME, currtok->txt,
+                              "StructDecl:Param:Name"));
 
-// tree_t* parse_decl_enum(token_list_t *tokens, size_t index);
+    expectskip(":");
+
+    add_child(param, parse_type(tokens, index));
+    skip();
+
+    if (tok_txt_is("=")) {
+      skip();
+      tree_t *default_val = new_tree(TREE_STRUCT_DECL_PARAM_DEFAULT, "",
+                                     "StructDecl:Param:Default");
+      add_child(default_val, parse_expr(tokens, index));
+      add_child(param, default_val);
+    }
+
+    return param;
+  }
+
+  THROW("Error when parsing structure parameter: got invalid token '%s'",
+        currtok->txt);
+}
+
+tree_t *parse_decl_struct_field(token_list_t *tokens, size_t *index) {
+  tree_t *field = new_tree(TREE_STRUCT_DECL_FIELD, "", "StructDecl:Field");
+
+  if (tok_type_is(T_PRIVATE)) {
+    add_child(field, new_tree(TREE_STRUCT_DECL_FIELD_PRIVATE, "",
+                              "StructDecl:Field:Private"));
+    skip();
+  }
+
+  if (tok_type_is(T_ID)) {
+    add_child(field, new_tree(TREE_STRUCT_DECL_FIELD_NAME, currtok->txt,
+                              "StructDecl:Field:Name"));
+    skip();
+  } else {
+    THROW("Structure field declaration has no name.");
+  }
+
+  if (tok_txt_is(":")) {
+    skip();
+    add_child(field, parse_type(tokens, index));
+  }
+
+  expectskip("=");
+
+  add_child(field, parse_expr(tokens, index));
+
+  return field;
+}
+
+tree_t *parse_decl_struct(token_list_t *tokens, size_t *index) {
+  tree_t *struct_decl = new_tree(TREE_STRUCT_DECL, "", "StructDecl");
+
+  expectskip("struct");
+
+  if (tok_type_is(T_ID)) {
+    add_child(struct_decl,
+              new_tree(TREE_STRUCT_DECL_NAME, currtok->txt, "StructDecl:Name"));
+    skip();
+  } else {
+    THROW("Structure declaration has no name.");
+  }
+
+  if (tok_txt_is("(")) {
+    skip();
+    add_child(struct_decl, parse_decl_struct_field(tokens, index));
+    skip();
+    while (tok_txt_is(",")) {
+      skip();
+      add_child(struct_decl, parse_decl_struct_field(tokens, index));
+      skip();
+    }
+  }
+
+  expectskip("{");
+  while (!tok_txt_is("}")) {
+    switch (currtok->type) {
+    case T_DECORATOR:
+    case T_FUNCTION:
+      add_child(struct_decl, parse_decl_function(tokens, index));
+      break;
+    case T_LET:
+    case T_CONST:
+      add_child(struct_decl, parse_decl_struct_field(tokens, index));
+      break;
+    default:
+      THROW("Invalid structure member: expected either a field or a function; "
+            "got token '%s'.",
+            currtok->txt);
+      break;
+    }
+    expectskip(";");
+  }
+  expectskip("}");
+
+  return struct_decl;
+}
+
+tree_t *parse_decl_enum(token_list_t *tokens, size_t *index) {
+  tree_t *enum_decl = new_tree(TREE_ENUM_DECL, "", "EnumDecl");
+
+  expectskip("enum");
+
+  if (tok_type_is(T_ID)) {
+    add_child(enum_decl,
+              new_tree(TREE_ENUM_DECL_NAME, currtok->txt, "EnumDecl:Name"));
+    skip();
+  } else {
+    THROW("Enumeration declaration has no name.");
+  }
+
+  expectskip("{");
+
+  add_child(enum_decl,
+            new_tree(TREE_ENUM_DECL_MEMBER, currtok->txt, "EnumDecl:Member"));
+  skip();
+  while (tok_txt_is(",")) {
+    skip();
+    add_child(enum_decl,
+              new_tree(TREE_ENUM_DECL_MEMBER, currtok->txt, "EnumDecl:Member"));
+    skip();
+  }
+
+  expectskip("}");
+
+  return enum_decl;
+}
+
+/* Utility */
+void _display_tree(tree_t *tree, int indent) {
+  char *indentstr = "";
+  for (size_t i = 0; i < (size_t)indent; i++) {
+    strcatchr(indentstr, '\t');
+  }
+  printf(BLU "%s" CRESET ": " GRN "%s" CRESET, tree->label, tree->data);
+  for (size_t i = 0; i < tree->child_count; i++) {
+    _display_tree(tree->children[i], indent + 1);
+  }
+}
 
 /* TODO */
 
 #define TODO_PARSE_FUNC(name)                                                  \
-  tree_t *name(token_list_t *tokens, size_t index) {                           \
+  tree_t *name(token_list_t *tokens, size_t *index) {                          \
     UNUSED(tokens);                                                            \
     UNUSED(index);                                                             \
     TODO("function '" #name "'");                                              \
@@ -322,6 +474,3 @@ func_block:
 
 TODO_PARSE_FUNC(parse_expr)
 TODO_PARSE_FUNC(parse_statement)
-TODO_PARSE_FUNC(parse_decl_struct)
-TODO_PARSE_FUNC(parse_decl_struct_field)
-TODO_PARSE_FUNC(parse_decl_enum)

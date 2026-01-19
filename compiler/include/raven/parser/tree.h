@@ -49,6 +49,22 @@ typedef enum {
   TREE_FUNC_DECL_VAR_PARAM,
   TREE_FUNC_DECL_SELF,
 
+  /* Structure declaration */
+  TREE_STRUCT_DECL,
+  TREE_STRUCT_DECL_NAME,
+  TREE_STRUCT_DECL_PARAM,
+  TREE_STRUCT_DECL_PARAM_NAME,
+  TREE_STRUCT_DECL_PARAM_DEFAULT,
+
+  /* Structure field */
+  TREE_STRUCT_DECL_FIELD,
+  TREE_STRUCT_DECL_FIELD_PRIVATE,
+  TREE_STRUCT_DECL_FIELD_NAME,
+
+  /* Enumeration declaration */
+  TREE_ENUM_DECL,
+  TREE_ENUM_DECL_NAME,
+  TREE_ENUM_DECL_MEMBER
 } nodetype_t;
 
 typedef struct tree_t tree_t;
@@ -62,7 +78,7 @@ struct tree_t {
   size_t child_count;
 };
 
-tree_t *new_tree(nodetype_t type, char *data, const char *label);
+tree_t *new_tree(nodetype_t type, const char *data, const char *label);
 /* Frees the tree + all children, which means that
  * the WHOLE tree top-to-bottom is freed. Should only be used on
  * the tree's root to avoid double frees!

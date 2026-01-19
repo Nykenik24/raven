@@ -1,15 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "raven/error.h"
+#include "raven/parser/parser.h"
 #include "raven/parser/tree.h"
 
-tree_t *new_tree(nodetype_t type, char *data, const char *label) {
+tree_t *new_tree(nodetype_t type, const char *data, const char *label) {
   tree_t *tree = malloc(sizeof(tree_t));
   tree->type = type;
-  tree->data = data;
+
+  if (data) {
+    size_t len = strlen(data) + 1;
+    tree->data = malloc(len);
+    memcpy(tree->data, data, len);
+  } else {
+    tree->data = NULL;
+  }
+
+  if (label) {
+    size_t len = strlen(label) + 1;
+    tree->label = malloc(len);
+    memcpy(tree->label, label, len);
+  } else {
+    tree->label = NULL;
+  }
+
+  tree->children = NULL;
   tree->child_count = 0;
-  tree->label = (char *)label;
 
   return tree;
 }
@@ -33,8 +51,10 @@ void free_tree(tree_t *tree) {
 }
 
 void add_child(tree_t *tree, tree_t *child) {
-  tree->child_count++;
+  tree->children =
+      realloc(tree->children, sizeof(tree_t *) * (tree->child_count + 1));
   tree->children[tree->child_count] = child;
+  tree->child_count++;
 }
 
 int tree_contains_child(tree_t *tree, nodetype_t expected) {

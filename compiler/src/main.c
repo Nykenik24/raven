@@ -6,6 +6,8 @@
 #include "raven/colors.h"
 #include "raven/lexer/lexer.h"
 #include "raven/macros.h"
+#include "raven/parser/parser.h"
+#include "raven/parser/tree.h"
 #include "raven/raven.h"
 
 char *read_file_into_string(const char *filename) {
@@ -74,6 +76,8 @@ int main(void) {
   clock_t t1 = clock();
   double elapsed = (double)(t1 - t0) / CLOCKS_PER_SEC;
 
+  tree_t *cst = parse(tokens);
+
   printf("Version " MAG RAVEN_VERSION CRESET ", built on " MAG __DATE__
          " " __TIME__ "\n" CRESET);
 
@@ -97,6 +101,7 @@ int main(void) {
 
   printf(RED "<Source>" CRESET "\n%s" RED "<Source end>\n\n" CRESET, src);
   _display_token_list(tokens);
+  _display_tree(cst, 0);
 #else
   UNUSED(t0);
   UNUSED(t1);
@@ -106,6 +111,7 @@ int main(void) {
 
   //_display_token_list(tokens);
   free_token_list(tokens);
+  free_tree(cst);
 
   return EXIT_SUCCESS;
 }

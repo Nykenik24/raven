@@ -37,7 +37,7 @@ string =
 
 interpolated = "$", "{", { anychar - "}" }, "}" ;
 
-tag = "@", string ;
+tag = "@" string ; (* no whitespace between "@" and string, so that's why there is no comma *)
 
 letter =
       "a" | "b" | "c" | "d" | "e" | "f" | "g"
@@ -67,7 +67,7 @@ Literal =
     | ArrayLiteral
     | MapLiteral ;
 
-ArrayLiteral = "[", [ Expr, [ { ",", Expr } ] ], "]" ;
+ArrayLiteral = "[", [ Expr, { ",", Expr } ], "]" ;
 
 KeyValue = "[", Expr, "]", ":", Expr ;
 
@@ -129,12 +129,14 @@ Parameter =
     | "...", ident, TypeAnnot
     | ident, TypeAnnot, [ "=", Expr ] ;
 
+StructParameter = ident, TypeAnnot, [ "=", Expr ] ;
+
 Structure =
     "struct",
     ident,
-    [ "(", [ Parameter, { ",", Parameter } ], ")" ],
+    [ "(", StructParameter, { ",", StructParameter } , ")" ],
     "{",
-        { StructureField | Function },
+        { StructureField | Function }, ";",
     "}" ;
 
 StructureField =
@@ -142,8 +144,7 @@ StructureField =
     ident,
     [ TypeAnnot ],
     "=",
-    Expr,
-    ";" ;
+    Expr ;
 
 Enumeration =
     "enum",
@@ -225,7 +226,7 @@ Repeat =
     Expr,
     "{", Block, "}" ;
 
-Block = { Ignorable | Statement, ";" } ;
+Block = { Ignorable | Statement, ( ";" | "}" ) } ;
 
 (* ===== Expressions ===== *)
 
