@@ -7,4 +7,13 @@
 
 #define UNUSED(x) (void)(x);
 
+#define SAFECPY(STR, TARGET)                                                   \
+  if (STR) {                                                                   \
+    size_t len = strlen(STR) + 1;                                              \
+    TARGET = malloc(len);                                                      \
+    memcpy(TARGET, STR, len);                                                  \
+  } else {                                                                     \
+    TARGET = NULL;                                                             \
+  }
+
 #endif // INCLUDE_INCLUDE_MACROS_H_
