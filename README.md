@@ -49,3 +49,5 @@ Note that Raven will first support Linux, then Windows and finally MacOS (full s
 
 <!-- ## Phase 3 -->
 <!-- > See [phase 3's description](https://git.ddoichita.dev/nykenik24/raven/src/branch/main/docs/plan.md#phase-3-the-stage-2-compiler) here. -->
+## Raven Language
+Raven is a fast, pragmatic general-purpose language mixing imperative and object-oriented programming.
