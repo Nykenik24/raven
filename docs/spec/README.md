@@ -4,14 +4,16 @@
 1. [Syntax](./syntax/README.md)
     1. [Abstract syntax](./syntax/abstract_syntax.md)
     2. [Concrete syntax](./syntax/concrete_syntax.md)
-    3. [Lexer](./syntax/lexer/README.md)
-    4. [Parser](./syntax/parser/README.md)
-1. [Semantics](./semantics/README.md)
-    1. [Static semantics](./semantics/static/README.md)
-    2. [Dynamic semantics](./semantics/dynamic/README.md)
-1. [Compilation](./compiling/README.md)
-    1. [Code generation](./compiling/codegen.md)
-    2. [Optimization](./compiling/optimization.md)
+    3. [Lexer](./syntax/lexer/README.md) *TODO*
+        1. [Tokens](./syntax/lexer/tokens.md) *TODO*
+    4. [Parser](./syntax/parser/README.md) *TODO*
+        1. [Trees](./syntax/parser/trees.md) *TODO*
+1. [Semantics](./semantics/README.md) *TODO*
+    1. [Static semantics](./semantics/static/README.md) *TODO*
+    2. [Dynamic semantics](./semantics/dynamic/README.md) *TODO*
+1. [Compilation](./compiling/README.md) *TODO*
+    1. [Code generation](./compiling/codegen.md) *TODO*
+    2. [Optimization](./compiling/optimization.md) *TODO*
 ---
 
 ## Table of contents
