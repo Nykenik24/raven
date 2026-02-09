@@ -482,6 +482,8 @@ csq_token lex_operator(csq_lexer *lexer) {
     return make_token(lexer, TOKEN_COMMA, lexer->line, start_col);
   case '#':
     return make_token(lexer, TOKEN_HASH, lexer->line, start_col);
+  case '?':
+    return make_token(lexer, TOKEN_QUESTION_MARK, lexer->line, start_col);
   default:
     report_error(lexer, DIAG_ERROR_INVALID_CHAR, start_col, 1,
                  "invalid character encountered");

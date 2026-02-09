@@ -7,6 +7,8 @@
  * levels.
  */
 
+#include "csquare/logger.h"
+#include "csquare/token.h"
 #include <parser/expr.h>
 #include <parser/parser.h>
 #include <stdlib.h>
@@ -190,6 +192,22 @@ csq_node *expr_parse_postfix(csq_parser *parser) {
       access->data.access.member = parse_identifier_node(parser);
 
       node = access;
+    } else if (parser_match(parser, TOKEN_IDENTIFIER)) {
+      csq_log(LOG_DEBUG, "source", 196, "Parsing check-for-nil.");
+      csq_node *nil_check = node_create(NODE_BINARY_OP, parser->previous.line,
+                                        parser->previous.column);
+      binary_op op = BINOP_EQ;
+      nil_check->data.binary.op = op;
+      parser_consume(parser, TOKEN_IDENTIFIER,
+                     "Expected identifier before question mark");
+      nil_check->data.binary.left = parse_identifier_node(parser);
+      nil_check->data.binary.right = node_create(
+          NODE_LITERAL_NIL, parser->previous.line, parser->previous.column);
+
+      parser_consume(
+          parser, TOKEN_QUESTION_MARK,
+          "Expected question mark after identifier in check-for-nil .");
+      node = nil_check;
     } else {
       break;
     }

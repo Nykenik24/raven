@@ -14,7 +14,7 @@ const char *const token_strings[] = {TOKEN_LIST};
 static const int token_count = sizeof(token_strings) / sizeof(token_strings[0]);
 
 const char *token_type_to_string(csq_tktype type) {
-  if (type >= 0 && type < token_count) {
+  if (type >= 0 && (const int)type < token_count) {
     return token_strings[type];
   }
   return "UNKNOWN";
