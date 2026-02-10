@@ -54,6 +54,7 @@ typedef struct {
     loop_label* loop_stack;
     size_t loop_stack_count;
     size_t loop_stack_capacity;
+    DiagID codegen_error_id;
 } gen_ctx;
 
 gen_ctx* gen_create(ast_context* ast);

@@ -7,6 +7,8 @@
  * levels.
  */
 
+#include "csquare/logger.h"
+#include "csquare/token.h"
 #include <parser/expr.h>
 #include <parser/parser.h>
 #include <stdlib.h>
@@ -190,6 +192,16 @@ csq_node *expr_parse_postfix(csq_parser *parser) {
       access->data.access.member = parse_identifier_node(parser);
 
       node = access;
+    } else if (parser_match(parser, TOKEN_QUESTION_MARK)) {
+      //csq_log(LOG_DEBUG, "source", 196, "Parsing check-for-nil.");
+      csq_node *nil_check = node_create(NODE_BINARY_OP, parser->previous.line,
+                                        parser->previous.column);
+      binary_op op = BINOP_EQ;
+      nil_check->data.binary.op = op;
+      nil_check->data.binary.left = node;
+      nil_check->data.binary.right = node_create(
+          NODE_LITERAL_NIL, parser->previous.line, parser->previous.column);
+      node = nil_check;
     } else {
       break;
     }
@@ -259,10 +271,17 @@ csq_node *expr_parse_multiplicative(csq_parser *parser) {
       break;
 
     csq_node *right = expr_parse_unary(parser);
+    if (!right) {
+      node_free(node);
+      return NULL;
+    }
+
     csq_node *bin = node_create(NODE_BINARY_OP, parser->previous.line,
                                 parser->previous.column);
-    if (!bin)
+    if (!bin) {
+      node_free(right);
       return node;
+    }
 
     bin->data.binary.op = op;
     bin->data.binary.left = node;
@@ -288,10 +307,17 @@ csq_node *expr_parse_additive(csq_parser *parser) {
       break;
 
     csq_node *right = expr_parse_multiplicative(parser);
+    if (!right) {
+      node_free(node);
+      return NULL;
+    }
+
     csq_node *bin = node_create(NODE_BINARY_OP, parser->previous.line,
                                 parser->previous.column);
-    if (!bin)
+    if (!bin) {
+      node_free(right);
       return node;
+    }
 
     bin->data.binary.op = op;
     bin->data.binary.left = node;
@@ -321,10 +347,17 @@ csq_node *expr_parse_comparison(csq_parser *parser) {
       break;
 
     csq_node *right = expr_parse_additive(parser);
+    if (!right) {
+      node_free(node);
+      return NULL;
+    }
+
     csq_node *bin = node_create(NODE_BINARY_OP, parser->previous.line,
                                 parser->previous.column);
-    if (!bin)
+    if (!bin) {
+      node_free(right);
       return node;
+    }
 
     bin->data.binary.op = op;
     bin->data.binary.left = node;
@@ -349,10 +382,16 @@ csq_node *expr_parse_equality(csq_parser *parser) {
     else
       break;
     csq_node *right = expr_parse_bitwise_or(parser);
+    if (!right) {
+      node_free(node);
+      return NULL;
+    }
     csq_node *bin = node_create(NODE_BINARY_OP, parser->previous.line,
                                 parser->previous.column);
-    if (!bin)
+    if (!bin) {
+      node_free(right);
       return node;
+    }
 
     bin->data.binary.op = op;
     bin->data.binary.left = node;
@@ -370,10 +409,16 @@ csq_node *expr_parse_bitwise_or(csq_parser *parser) {
 
   while (parser_match(parser, TOKEN_PIPE)) {
     csq_node *right = expr_parse_bitwise_xor(parser);
+    if (!right) {
+      node_free(node);
+      return NULL;
+    }
     csq_node *bin = node_create(NODE_BINARY_OP, parser->previous.line,
                                 parser->previous.column);
-    if (!bin)
+    if (!bin) {
+      node_free(right);
       return node;
+    }
 
     bin->data.binary.op = BINOP_BIT_OR;
     bin->data.binary.left = node;
@@ -391,10 +436,16 @@ csq_node *expr_parse_bitwise_xor(csq_parser *parser) {
 
   while (parser_match(parser, TOKEN_CARET)) {
     csq_node *right = expr_parse_bitwise_and(parser);
+    if (!right) {
+      node_free(node);
+      return NULL;
+    }
     csq_node *bin = node_create(NODE_BINARY_OP, parser->previous.line,
                                 parser->previous.column);
-    if (!bin)
+    if (!bin) {
+      node_free(right);
       return node;
+    }
 
     bin->data.binary.op = BINOP_BIT_XOR;
     bin->data.binary.left = node;
@@ -412,10 +463,16 @@ csq_node *expr_parse_bitwise_and(csq_parser *parser) {
 
   while (parser_match(parser, TOKEN_AMPERSAND)) {
     csq_node *right = expr_parse_comparison(parser);
+    if (!right) {
+      node_free(node);
+      return NULL;
+    }
     csq_node *bin = node_create(NODE_BINARY_OP, parser->previous.line,
                                 parser->previous.column);
-    if (!bin)
+    if (!bin) {
+      node_free(right);
       return node;
+    }
 
     bin->data.binary.op = BINOP_BIT_AND;
     bin->data.binary.left = node;
@@ -434,10 +491,16 @@ csq_node *expr_parse_and(csq_parser *parser) {
   while (parser_match(parser, TOKEN_KEYWORD_AND) ||
          parser_match(parser, TOKEN_LOGICAL_AND)) {
     csq_node *right = expr_parse_equality(parser);
+    if (!right) {
+      node_free(node);
+      return NULL;
+    }
     csq_node *bin = node_create(NODE_BINARY_OP, parser->previous.line,
                                 parser->previous.column);
-    if (!bin)
+    if (!bin) {
+      node_free(right);
       return node;
+    }
 
     bin->data.binary.op = BINOP_AND;
     bin->data.binary.left = node;
@@ -456,10 +519,16 @@ csq_node *expr_parse_or(csq_parser *parser) {
   while (parser_match(parser, TOKEN_KEYWORD_OR) ||
          parser_match(parser, TOKEN_LOGICAL_OR)) {
     csq_node *right = expr_parse_and(parser);
+    if (!right) {
+      node_free(node);
+      return NULL;
+    }
     csq_node *bin = node_create(NODE_BINARY_OP, parser->previous.line,
                                 parser->previous.column);
-    if (!bin)
+    if (!bin) {
+      node_free(right);
       return node;
+    }
 
     bin->data.binary.op = BINOP_OR;
     bin->data.binary.left = node;
@@ -489,10 +558,17 @@ csq_node *expr_parse_assignment(csq_parser *parser) {
     return node;
 
   csq_node *right = expr_parse_assignment(parser);
+  if (!right) {
+    node_free(node);
+    return NULL;
+  }
   csq_node *bin = node_create(NODE_BINARY_OP, parser->previous.line,
                               parser->previous.column);
-  if (!bin)
-    return node;
+  if (!bin) {
+    node_free(right);
+    node_free(node);
+    return NULL;
+  }
 
   bin->data.binary.op = op;
   bin->data.binary.left = node;

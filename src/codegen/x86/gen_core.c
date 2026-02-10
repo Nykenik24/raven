@@ -95,6 +95,7 @@ gen_ctx* gen_create(ast_context* ast) {
     ctx->source_path = NULL;
     ctx->source_buffer = NULL;
     ctx->syntax_mode = ASM_SYNTAX_ATT;
+    ctx->codegen_error_id = 0;
     
     return ctx;
 }

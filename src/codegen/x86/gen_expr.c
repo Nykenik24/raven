@@ -14,9 +14,11 @@
 #include <codegen/x86/gen_var.h>
 #include <codegen/x86/inst.h>
 #include <codegen/x86/label.h>
+#include <core/ansi.h>
 #include <core/diag.h>
 #include <parser/node.h>
 #include <parser/types.h>
+#include <stdio.h>
 #include <string.h>
 
 void gen_expression(gen_ctx *ctx, csq_node *node) {
@@ -63,11 +65,12 @@ void gen_identifier(gen_ctx *ctx, csq_node *node) {
   if (var) {
     inst_mov_reg_mem(ctx->emit, REG_EAX, REG_EBP, var->offset);
   } else {
-    if (ctx->diag && ctx->source_path) {
-      diag_report_error(ctx->diag, DIAG_ERROR_UNDEFINED_VARIABLE,
-                        ctx->source_path, node->line, node->column,
-                        strlen(name), NULL, "Undefined variable");
+    if (ctx->diag) {
+      LocationManager *loc_mgr = diag_get_location_manager(ctx->diag);
+      LocationID loc_id = diag_location_add(loc_mgr, ctx->source_path, node->line, node->column, 0);
+      diag_report_fmt(ctx->diag, ctx->codegen_error_id, loc_id, "undefined variable '%s'", name);
     }
+    inst_mov_reg_imm(ctx->emit, REG_EAX, 0);
   }
 }
 
@@ -142,7 +145,7 @@ void gen_index(gen_ctx *ctx, csq_node *node) {
   inst_cmp_reg_imm(ctx->emit, REG_EAX, 0);
   emit_line(ctx->emit, "jge %s", bounds_check_label);
 
-  emit_line(ctx->emit, "movl $%d, %%eax", DIAG_ERROR_ARRAY_INDEX_OUT_OF_BOUNDS);
+  /// @todo Implement bounds checking with diagnostics
   emit_line(ctx->emit, "int $0x80");
 
   emit_line(ctx->emit, "%s:", bounds_check_label);
@@ -167,8 +170,7 @@ void gen_index(gen_ctx *ctx, csq_node *node) {
     inst_cmp_reg_imm(ctx->emit, REG_EAX, (int)array_size);
     emit_line(ctx->emit, "jl %s", valid_label);
 
-    emit_line(ctx->emit, "movl $%d, %%eax",
-              DIAG_ERROR_ARRAY_INDEX_OUT_OF_BOUNDS);
+    /// @todo Implement bounds checking with diagnostics
     emit_line(ctx->emit, "int $0x80");
   }
 

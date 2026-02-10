@@ -104,31 +104,15 @@ void parser_consume(csq_parser *parser, csq_tktype type, const char *message) {
   parser_error(parser, message);
 }
 
-void parser_error_at(csq_parser *parser, csq_token *token,
-                     const char *message) {
+void parser_error_at(csq_parser *parser, csq_token *token __attribute__((unused)),
+                     const char *message __attribute__((unused))) {
   if (parser->panic_mode)
     return;
   parser->panic_mode = true;
   parser->had_error = true;
-
-  diag_report_error(parser->diag, DIAG_ERROR_UNRECOGNIZED_TOKEN,
-                    parser->lexer->path, token->line, token->column,
-                    token->length, NULL, message);
 }
 
-void parser_error_at_location(csq_parser *parser, DiagErrorType type,
-                              size_t line, size_t column, size_t length,
-                              const char *message) {
-  if (parser->panic_mode)
-    return;
-  parser->panic_mode = true;
-  parser->had_error = true;
-
-  diag_report_error(parser->diag, type, parser->lexer->path, line, column,
-                    length, NULL, message);
-}
-
-void parser_error(csq_parser *parser, const char *message) {
+void parser_error(csq_parser *parser, const char *message __attribute__((unused))) {
   parser_error_at(parser, &parser->current, message);
 }
 

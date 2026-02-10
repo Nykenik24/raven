@@ -110,6 +110,17 @@ int main(int argc, char **argv) {
       gen->diag = diag;
       gen->source_path = filepath;
       gen->source_buffer = src->buffer;
+      
+      /* Register code generation error types */
+      DiagMetadata undefined_var_meta = {
+        .id = 1,
+        .code = NULL,
+        .name = "undefined_variable",
+        .level = DIAG_LEVEL_ERROR,
+        .message = "undefined variable",
+        .help_text = "The variable has not been declared in this scope"
+      };
+      gen->codegen_error_id = diag_register_metadata(diag, undefined_var_meta);
       gen_set_asm_mode(gen, 1);
       if (opts->asm_backend == ASM_BACKEND_INTEL) {
         gen_set_syntax(gen, ASM_SYNTAX_INTEL);

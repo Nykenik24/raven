@@ -89,9 +89,7 @@ csq_node* parse_var_declaration(csq_parser* parser, bool is_const) {
             size_t actual_size = init->data.array_literal.elements.count;
             
             if (actual_size != declared_array_size) {
-                parser_error_at_location(parser, DIAG_ERROR_ARRAY_TYPE_MISMATCH,
-                                        init->line, init->column, 1,
-                                        "Array size mismatch");
+                /// @todo Implement metadata-driven diagnostic reporting for array size mismatch
             }
         }
     } else if (is_const) {
