@@ -1,3 +1,10 @@
+/**
+ * @file diag.c
+ * @brief Diagnostic reporting system
+ * @details Manages compilation errors, warnings, and informational messages
+ * with proper source location tracking and formatting.
+ */
+
 #include <core/ansi.h>
 #include <core/diag.h>
 #include <limits.h>
@@ -5,11 +12,39 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char *error_type_strings[] = {
-    "invalid character",      "unterminated string", "invalid escape sequence",
-    "malformed number",       "invalid number base", "unrecognized token",
-    "unexpected end of file", "invalid identifier",  "undefined identifier"};
+static const char *error_type_strings[] = {"invalid character",
+                                           "unterminated string",
+                                           "invalid escape sequence",
+                                           "malformed number",
+                                           "invalid number base",
+                                           "unrecognized token",
+                                           "unexpected end of file",
+                                           "invalid identifier",
+                                           "undefined identifier",
+                                           "undefined variable",
+                                           "undefined type",
+                                           "undefined function",
+                                           "duplicate variable",
+                                           "duplicate function",
+                                           "type mismatch",
+                                           "invalid type",
+                                           "invalid argument",
+                                           "too many arguments",
+                                           "too few arguments",
+                                           "invalid operation",
+                                           "divide by zero",
+                                           "stack overflow",
+                                           "null pointer",
+                                           "out of bounds",
+                                           "array index out of bounds",
+                                           "array index must be integer",
+                                           "array element type mismatch",
+                                           "array is empty"};
 
+/**
+ * @brief Create diagnostic reporter
+ * @return Allocated reporter structure
+ */
 DiagReporter *diag_reporter_create(void) {
   DiagReporter *reporter = malloc(sizeof(DiagReporter));
   if (!reporter)
@@ -21,6 +56,10 @@ DiagReporter *diag_reporter_create(void) {
   return reporter;
 }
 
+/**
+ * @brief Free diagnostic reporter
+ * @param reporter Reporter to deallocate
+ */
 void diag_reporter_free(DiagReporter *reporter) {
   if (!reporter)
     return;
@@ -33,6 +72,16 @@ void diag_reporter_free(DiagReporter *reporter) {
   free(reporter);
 }
 
+/**
+ * @brief Report a diagnostic error
+ * @param reporter Reporter instance
+ * @param type Error type enumeration
+ * @param path Source file path
+ * @param line Line number
+ * @param column Column number
+ * @param length Error region length
+ * @param message Error message
+ */
 void diag_report(DiagReporter *reporter, DiagErrorType type, const char *path,
                  size_t line, size_t column, size_t length,
                  const char *message) {
