@@ -54,3 +54,16 @@ if (count > 5) {
 - [Documentation](https://github.com/C2-Lang/csq-docs).
 - [Specification](https://github.com/C2-Lang/csq-spec).
 -->
+
+## Support/contact
+- Contact the founder of [@C2-Lang](https://github.com/csq-lang) [Nykenik24](Nykenik24@proton.me).
+- Open an [**issue**](https://github.com/csq-lang/csquared/issues).
+
+## Support the C squared team
+To support our incredible (but small) team, you can:
+- [Contribute](https://github.com/csq-lang/csquared/blob/main/CONTRIBUTE.md) to the compiler.
+- Star this repo (it **REALLY** helps!).
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=csq-lang/csquared&type=date&legend=top-left)](https://www.star-history.com/#csq-lang/csquared&type=date&legend=top-left)
